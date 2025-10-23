@@ -1,0 +1,18 @@
+# .prettierignore
+# Rails / Ruby
+*.lock
+*.sqlite3
+db/schema.rb
+bin/*
+log/*
+tmp/*
+coverage/*
+public/assets/*
+node_modules
+vendor
+**/*.rb
+**/*.rake
+**/*.erb
+
+# Grosse data
+*.json.gz
