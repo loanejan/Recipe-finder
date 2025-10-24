@@ -13,13 +13,14 @@ export default function RecipePage() {
         ← Back to list
       </Link>
       <div className="rounded-xl2 overflow-hidden bg-brand-card border border-white/5 shadow-soft">
-        {recipe.image && (
-          <img
-            src={recipe.image}
-            alt={recipe.title}
-            className="w-full max-h-[420px] object-cover"
-          />
-        )}
+        <img
+          src={"/placeholder-recipe.jpg"}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/placeholder-recipe.jpg";
+          }}
+          alt={recipe.title}
+          className="w-full max-h-[420px] object-cover"
+        />
         <div className="p-5">
           <h1 className="text-2xl font-semibold">{recipe.title}</h1>
           <p className="text-sm text-brand-muted mt-1">
