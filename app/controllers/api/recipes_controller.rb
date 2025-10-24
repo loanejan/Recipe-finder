@@ -6,7 +6,9 @@ module Api
       terms        = (pantry_terms + quick_terms).uniq
 
       if terms.any?
-        ing_ids = Ingredient.where(name: terms).pluck(:id)
+        ing_ids = Ingredient.where(terms.map { |t| "lower(name) LIKE ?" }.join(" OR "),
+                                  *terms.map { |t| "%#{t.downcase}%" }
+                                  ).pluck(:id)
         ing_ids = [0] if ing_ids.empty?
 
         recipes = Recipe.joins(:recipe_ingredients)
