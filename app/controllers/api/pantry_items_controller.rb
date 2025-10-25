@@ -1,19 +1,24 @@
+# app/controllers/api/pantry_items_controller.rb
 module Api
   class PantryItemsController < BaseController
     def index
-      items = PantryItem.order(:name).pluck(:id, :name).map { |id, name| { id: id, name: name } }
-      render json: items
+      render json: PantryItem.order(:name).map { |item| serialize(item) }
     end
 
     def create
-      name = params[:name].to_s.downcase.strip
-      item = PantryItem.create!(name: name)
-      render json: { id: item.id, name: item.name }, status: :created
+      item = PantryItem.create!(name: params[:name].to_s.downcase.strip)
+      render json: serialize(item), status: :created
     end
 
     def destroy
       PantryItem.find(params[:id]).destroy
       head :no_content
     end
+
+    private
+
+      def serialize(item)
+        { id: item.id, name: item.name }
+      end
   end
 end
