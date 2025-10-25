@@ -1,12 +1,46 @@
-import { useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { usePaginatedRecipesQuery } from "@/hooks/usePaginatedRecipesQuery";
 import IngredientChipsInput from "@/components/IngredientChipsInput";
 import RecipeCard from "@/components/RecipeCard";
 
-export default function RecipesPage() {
-  // chips state: ["egg", "tomato", ...]
-  const [extraIngredients, setExtraIngredients] = useState<string[]>([]);
+function parseIngsParam(sp: URLSearchParams): string[] {
+  const raw = sp.get("ings");
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter((s) => s.length > 0);
+}
 
+function serializeIngsParam(ings: string[]): string {
+  return ings.join(",");
+}
+
+export default function RecipesPage() {
+  // URL state
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // derive ingredients array from URL
+  const extraIngredients = useMemo(() => {
+    return parseIngsParam(searchParams);
+  }, [searchParams]);
+
+  // when user edits chips, update the URL (which is our single source of truth)
+  const handleChangeIngredients = useCallback(
+    (nextIngredients: string[]) => {
+      const next = new URLSearchParams(searchParams);
+      if (nextIngredients.length === 0) {
+        next.delete("ings");
+      } else {
+        next.set("ings", serializeIngsParam(nextIngredients));
+      }
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams]
+  );
+
+  // data fetching with React Query
   const {
     data,
     isLoading,
@@ -14,7 +48,7 @@ export default function RecipesPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isFetching, // this is any background refetch
+    isFetching,
   } = usePaginatedRecipesQuery(extraIngredients);
 
   const allRecipes =
@@ -29,14 +63,14 @@ export default function RecipesPage() {
             Recipes for you
           </h1>
           <p className="text-sm text-brand-muted">
-            Based on your pantry, plus anything you add below.
+            Based on your pantry and the ingredients you want to use.
           </p>
         </div>
 
-        {/* Chips input */}
+        {/* Chips input bound to URL */}
         <IngredientChipsInput
           ingredients={extraIngredients}
-          onChange={setExtraIngredients}
+          onChange={handleChangeIngredients}
           label="Add ingredients you want to use"
           placeholder="e.g. egg, tomato, garlic"
         />
@@ -70,7 +104,7 @@ export default function RecipesPage() {
             ))}
           </section>
 
-          {/* Load more */}
+          {/* Load more / Pagination */}
           <section className="flex justify-center pb-12">
             {hasNextPage ? (
               <button

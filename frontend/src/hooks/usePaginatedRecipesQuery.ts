@@ -20,12 +20,10 @@ export type RecipePageResponse = {
   };
 };
 
-// turn ["egg","tomato"] -> "egg,tomato"
 function buildQueryParamFromIngredients(extraIngredients: string[]) {
   return extraIngredients.join(",");
 }
 
-// Fetch a single page from backend with pantry + extras
 async function fetchRecipesPage(pageParam: number, extraIngredients: string[]) {
   const params = new URLSearchParams({
     page: String(pageParam),
@@ -45,7 +43,6 @@ async function fetchRecipesPage(pageParam: number, extraIngredients: string[]) {
   return data;
 }
 
-// Hook with infinite pagination + "chips" as input
 export function usePaginatedRecipesQuery(extraIngredients: string[]) {
   return useInfiniteQuery({
     queryKey: ["recipes", extraIngredients],
