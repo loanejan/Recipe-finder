@@ -75,7 +75,7 @@ export default function RecipePage() {
 
           {/* Meta résumé */}
           <div className="text-sm text-brand-muted flex flex-wrap gap-x-4 gap-y-2">
-            {recipe.total_time && (
+            {recipe.total_time && recipe.total_time > 0 && (
               <span className="flex items-center gap-1">
                 <span role="img" aria-label="time">
                   ⏱
@@ -84,12 +84,12 @@ export default function RecipePage() {
               </span>
             )}
 
-            {recipe.servings && recipe.servings !== "" && (
+            {recipe.yields && recipe.yields !== "" && (
               <span className="flex items-center gap-1">
-                <span role="img" aria-label="servings">
+                <span role="img" aria-label="yields">
                   🍽
                 </span>
-                <span>{recipe.servings}</span>
+                <span>{recipe.yields}</span>
               </span>
             )}
           </div>

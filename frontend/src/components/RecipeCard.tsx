@@ -33,7 +33,7 @@ export default function RecipeCard({ r }: RecipeCardProps) {
 
         {/* Meta row conditionnelle */}
         <div className="text-sm text-brand-muted flex flex-wrap gap-2">
-          {r.total_time && (
+          {r.total_time && r.total_time > 0 && (
             <span className="flex items-center gap-1">
               <span role="img" aria-label="time">
                 ⏱
@@ -44,7 +44,7 @@ export default function RecipeCard({ r }: RecipeCardProps) {
 
           {r.yields && (
             <span className="flex items-center gap-1">
-              <span role="img" aria-label="servings">
+              <span role="img" aria-label="yields">
                 🍽
               </span>
               <span>{r.yields}</span>

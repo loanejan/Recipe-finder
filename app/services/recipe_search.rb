@@ -80,7 +80,7 @@ class RecipeSearch
           title:        recipe.title,
           image:        recipe.image,
           total_time:   recipe.total_time,
-          servings:     recipe.yields || "N/A",
+          yields:     recipe.yields || "N/A",
           total_ings:   total_ings,
           matched_ings: matched_ings,
           _score:       score
@@ -99,7 +99,7 @@ class RecipeSearch
             title:        r.title,
             image:        r.image,
             total_time:   r.total_time,
-            servings:     r.yields || "N/A",
+            yields:     r.yields || "N/A",
             total_ings:   nil,
             matched_ings: nil,
             _score:       0.0
