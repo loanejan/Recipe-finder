@@ -5,7 +5,7 @@ import RecipeCard from "@/components/RecipeCard";
 import { RecipeListItem, useRecipesPaginated } from "@/hooks/useRecipesPaginated";
 
 function parseIngsParam(sp: URLSearchParams): string[] {
-  const raw = sp.get("ings");
+  const raw = sp.get("q");
   if (!raw) return [];
   return raw
     .split(",")
@@ -13,14 +13,14 @@ function parseIngsParam(sp: URLSearchParams): string[] {
     .filter((s) => s.length > 0);
 }
 
-function serializeIngsParam(ings: string[]): string {
-  return ings.join(",");
+function serializeIngsParam(q: string[]): string {
+  return q.join(",");
 }
 
 export default function RecipesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // chips -> dérivées de l'URL (?ings=egg,tomato)
+  // chips -> dérivées de l'URL (?a=egg,tomato)
   const extraIngredients = useMemo(() => parseIngsParam(searchParams), [searchParams]);
 
   // quand on modifie les chips, on met à jour l'URL
@@ -29,9 +29,9 @@ export default function RecipesPage() {
     (nextIngredients: string[]) => {
       const next = new URLSearchParams(searchParams);
       if (nextIngredients.length === 0) {
-        next.delete("ings");
+        next.delete("q");
       } else {
-        next.set("ings", serializeIngsParam(nextIngredients));
+        next.set("q", serializeIngsParam(nextIngredients));
       }
       setSearchParams(next, { replace: true });
     },
