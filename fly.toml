@@ -1,0 +1,32 @@
+# fly.toml app configuration file generated for pennylane-technical-test-divine-dream-9420 on 2025-10-26T21:03:45+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'pennylane-technical-test-divine-dream-9420'
+primary_region = 'fra'
+console_command = '/rails/bin/rails console'
+
+[build]
+
+[deploy]
+  release_command = './bin/rails db:prepare'
+
+[env]
+  PORT = '8080'
+
+[processes]
+    app = 'bundle exec rails server -b 0.0.0.0 -p 8080 -e production'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
