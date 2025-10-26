@@ -84,7 +84,7 @@ export default function RecipePage() {
               </span>
             )}
 
-            {recipe.yields && recipe.yields !== "" && (
+            {recipe.yields && recipe.yields !== "N/A" && (
               <span className="flex items-center gap-1">
                 <span role="img" aria-label="yields">
                   🍽

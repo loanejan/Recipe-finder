@@ -42,15 +42,6 @@ export default function RecipeCard({ r }: RecipeCardProps) {
             </span>
           )}
 
-          {r.yields && (
-            <span className="flex items-center gap-1">
-              <span role="img" aria-label="yields">
-                🍽
-              </span>
-              <span>{r.yields}</span>
-            </span>
-          )}
-
           {r.total_ings != null &&
             r.matched_ings != null && (
               <span className="flex items-center gap-1">
