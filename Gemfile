@@ -75,5 +75,11 @@ group :test do
   gem "rspec-rails"
 end
 
+group :production do
+  gem "sqlite3", "~> 1.7"
+end
+
 gem "rubocop", "~> 1.81", group: :development
 gem "rubocop-rails", "~> 2.33", group: :development
+
+gem "dockerfile-rails", ">= 1.7", group: :development
