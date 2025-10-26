@@ -1,40 +1,33 @@
 # app/domain/recipe_matcher.rb
 #
-# Pure domain logic for scoring how relevant a recipe is
-# given a set of available ingredient IDs.
-#
-# NOTE:
-# - This class NO LONGER knows anything about SQL.
-# - It's just "how to compute a score" for a recipe.
+# RecipeMatcher encapsulates how we score a recipe match.
+# We don't touch ActiveRecord here; we just apply product logic.
 #
 class RecipeMatcher
-    attr_reader :ingredient_ids
-  
-    def initialize(ingredient_ids)
-      # Ingredient IDs the user "has"
-      @ingredient_ids = Array(ingredient_ids).presence || [0]
-    end
-  
-    # Compute a numeric score for a recipe instance, in Ruby.
-    #
-    # score = (matched / total) - penalty_for_missing
-    #
-    # Where penalty_for_missing = 0.05 * missing_count
-    #
-    # Higher is better.
-    #
-    # Expects recipe.recipe_ingredients (and thus ingredient_id) to be loaded.
-    def score_for(recipe)
-      total = recipe.recipe_ingredients.size
-      return 0.0 if total.zero?
-  
-      matched = recipe.recipe_ingredients.count do |ri|
-        ingredient_ids.include?(ri.ingredient_id)
-      end
-  
-      missing = total - matched
-  
-      (matched.to_f / total) - 0.05 * missing
-    end
+  attr_reader :user_ingredient_ids
+
+  def initialize(user_ingredient_ids)
+    # user_ingredient_ids = array of ingredient IDs considered "available"
+    @user_ingredient_ids = Array(user_ingredient_ids).presence || []
   end
-  
+
+  # Returns a numeric score. Higher = more relevant.
+  #
+  # We expect:
+  #   total_ings   : number of DISTINCT ingredients in the recipe
+  #   matched_ings : number of DISTINCT ingredients the user already has
+  #
+  # score formula:
+  #   ratio = matched_ings / total_ings
+  #   missing = total_ings - matched_ings
+  #   score = ratio - 0.05 * missing
+  #
+  def score_for(total_ings:, matched_ings:)
+    return 0.0 if total_ings.to_i <= 0
+
+    ratio   = matched_ings.to_f / total_ings.to_f
+    missing = total_ings - matched_ings
+
+    ratio - 0.05 * missing
+  end
+end

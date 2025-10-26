@@ -2,9 +2,8 @@ module Api
   class RecipesController < BaseController
     def index
       result = RecipeSearch.call(
-        pantry_scope: PantryItem.all,
-        query: params[:q],
-        page: params[:page],
+        query:    params[:q],
+        page:     params[:page],
         per_page: params[:per_page]
       )
 

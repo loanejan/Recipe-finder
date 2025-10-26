@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   namespace :api do
     resources :recipes, only: [:index, :show]
-    resources :pantry_items, only: [:index, :create, :destroy]
   end
 
   root 'static#index'

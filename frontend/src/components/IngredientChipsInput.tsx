@@ -71,7 +71,6 @@ export default function IngredientChipsInput({
       </div>
 
       <p className="text-[11px] text-brand-muted leading-snug">
-        We’ll combine these with your pantry items to suggest the most relevant recipes.
         Press Enter or comma to add each ingredient.
       </p>
     </div>

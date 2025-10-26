@@ -1,4 +1,3 @@
-export type PantryItem = { id: number; name: string };
 export type RecipeListItem = {
   id: number;
   title: string;

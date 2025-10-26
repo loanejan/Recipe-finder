@@ -1,6 +1,5 @@
 import { Link, Route, Routes } from "react-router-dom";
 import RecipesPage from "./pages/RecipesPage";
-import PantryPage from "./pages/PantryPage";
 import RecipePage from "./pages/RecipePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Logo from "./components/Logo";
@@ -18,9 +17,6 @@ export default function App() {
             <Link to="/" className="hover:text-brand-text">
               Recipes
             </Link>
-            <Link to="/pantry" className="hover:text-brand-text">
-              My pantry
-            </Link>
           </nav>
         </div>
       </header>
@@ -28,7 +24,6 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RecipesPage />} />
           <Route path="/recipes/:id" element={<RecipePage />} />
-          <Route path="/pantry" element={<PantryPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
