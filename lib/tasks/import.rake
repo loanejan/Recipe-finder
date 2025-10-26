@@ -11,12 +11,12 @@ namespace :data do
       ActiveRecord::Base.logger.silence do
         Recipe.transaction do
           data.each_with_index do |r, i|
+            
             recipe = Recipe.create!(
               title: r["title"],
-              total_time: r["total_time"] || r["cook_time"] || r["prep_time"],
+              total_time: [r["cook_time"], r["prep_time"]].compact.sum,
               yields: r["yields"],
               image: r["image"],
-              url:   r["source"] || r["host"]
             )
 
             (r["ingredients"] || r["ingredient_list"] || []).each do |raw|
