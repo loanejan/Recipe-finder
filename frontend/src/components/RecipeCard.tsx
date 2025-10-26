@@ -1,33 +1,69 @@
 import { Link } from "react-router-dom";
-import { RecipeListItem } from "@/hooks/useRecipesPaginated";
+import React from "react";
+import type { RecipeListItem } from "@/hooks/useRecipesPaginated";
 
-export default function RecipeCard({ r }: { r: RecipeListItem }) {
+interface RecipeCardProps {
+  r: RecipeListItem;
+}
+
+export default function RecipeCard({ r }: RecipeCardProps) {
   return (
-    <Link to={`/recipes/${r.id}`} className="group">
-      <article className="overflow-hidden rounded-xl2 bg-brand-card border border-white/5 shadow-soft hover:border-brand-primary/40 transition">
+    <Link
+      to={`/recipes/${r.id}`}
+      className="block rounded-xl2 overflow-hidden bg-brand-card border border-white/5 shadow-soft hover:shadow-md hover:border-brand-primary/40 transition-shadow transition-colors"
+    >
+      {/* Image si dispo */}
+      {r.image && (
         <img
-          src={"/placeholder-recipe.jpg"}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = "/placeholder-recipe.jpg";
-          }}
+          src={r.image}
           alt={r.title}
-          className="aspect-video w-full object-cover opacity-95 group-hover:opacity-100"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src =
+              "/placeholder-recipe.jpg";
+          }}
+          className="w-full max-h-[300px] object-cover"
         />
-        <div className="p-4">
-          <h3 className="font-medium leading-snug group-hover:text-brand-text">{r.title}</h3>
-          <p className="mt-1 text-xs text-brand-muted">
-            {r.matched_ings != null && r.total_ings != null ? (
-              <span>
-                {r.matched_ings}/{r.total_ings} matched
+      )}
+
+      <div className="p-4 space-y-2">
+        {/* Titre */}
+        <h2 className="text-base font-semibold text-brand-text leading-snug line-clamp-2 group-hover:text-brand-text/90">
+          {r.title}
+        </h2>
+
+        {/* Meta row conditionnelle */}
+        <div className="text-sm text-brand-muted flex flex-wrap gap-2">
+          {r.total_time && (
+            <span className="flex items-center gap-1">
+              <span role="img" aria-label="time">
+                ⏱
               </span>
-            ) : (
-              <span>
-                {r.total_time ? `${r.total_time} min` : "Time n/a"} · {r.yields ?? "Servings n/a"}
+              <span>{r.total_time} min</span>
+            </span>
+          )}
+
+          {r.yields && (
+            <span className="flex items-center gap-1">
+              <span role="img" aria-label="servings">
+                🍽
+              </span>
+              <span>{r.yields}</span>
+            </span>
+          )}
+
+          {r.total_ings != null &&
+            r.matched_ings != null && (
+              <span className="flex items-center gap-1">
+                <span role="img" aria-label="match">
+                  ✅
+                </span>
+                <span>
+                  {r.matched_ings}/{r.total_ings} ingrédients
+                </span>
               </span>
             )}
-          </p>
         </div>
-      </article>
+      </div>
     </Link>
   );
 }
