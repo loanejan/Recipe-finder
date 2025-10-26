@@ -10,7 +10,7 @@ export type RecipeDetail = {
   id: number;
   title: string;
   total_time: number | null;
-  yields?: string | null; // si tu renvoies encore `yields`, remplace par `yields?: string | null`
+  yields?: string | null;
   image: string | null;
   url: string | null;
   ingredients: RecipeIngredientDetail[];

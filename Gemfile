@@ -62,6 +62,7 @@ group :development do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem "web-console"
+  gem "rspec-rails"
 end
 
 group :test do
@@ -71,6 +72,7 @@ group :test do
   gem 'pry-rails'
   gem "capybara"
   gem "selenium-webdriver"
+  gem "rspec-rails"
 end
 
 gem "rubocop", "~> 1.81", group: :development
