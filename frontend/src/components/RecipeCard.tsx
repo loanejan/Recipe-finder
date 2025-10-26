@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import type { RecipeListItem } from "@/types";
+import { RecipeListItem } from "@/hooks/useRecipesPaginated";
+
 export default function RecipeCard({ r }: { r: RecipeListItem }) {
   return (
     <Link to={`/recipes/${r.id}`} className="group">
