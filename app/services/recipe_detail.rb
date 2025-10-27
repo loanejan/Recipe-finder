@@ -1,16 +1,3 @@
-# app/services/recipe_detail.rb
-#
-# RecipeDetail is the application service for the "show recipe" use case.
-#
-# It returns a complete hash describing a single recipe, including:
-# - basic metadata (title, total_time, yields, url, image)
-# - all its ingredients, with both normalized name and raw text
-#
-# The controller can then just `render json: ...`
-#
-# This keeps controllers thin and gives us a single place to evolve
-# if we later add more detail (instructions, nutrition, etc.).
-
 class RecipeDetail
   def self.call(id:)
     new(id:).call

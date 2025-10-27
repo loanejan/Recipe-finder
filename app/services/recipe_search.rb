@@ -1,13 +1,6 @@
-# app/services/recipe_search.rb
-#
-# Use case:
-#   Given query terms, return a (paginated) list of recipes
-#   ranked by how well they match the user's available ingredients.
-#
-# This version:
 # - counts DISTINCT ingredients per recipe
 # - counts DISTINCT matched ingredients
-# - returns total_ings and matched_ings consistent with what the UI displays
+# - returns total_ings and matched_ings
 #
 class RecipeSearch
     def self.call(query:, page:, per_page:)
@@ -50,9 +43,8 @@ class RecipeSearch
       (quick_terms).uniq
     end
   
-    # Retourne deux choses :
     # - all_ids: tous les ingredient_ids qui matchent un des termes
-    # - id_to_term: un hash { ingredient_id => terme_utilisateur }
+    
     def match_ingredients_by_term(terms)
       id_to_term = {}
     
@@ -67,7 +59,7 @@ class RecipeSearch
       end
     
       all_ids = id_to_term.keys
-      [all_ids, id_to_term]
+      [all_ids, id_to_term] # - id_to_term: hash { ingredient_id => utilisateur_term }
     end
     
       
@@ -143,16 +135,11 @@ class RecipeSearch
       scored.sort_by { |h| -h[:_score] }
     end
 
-
-
-    # 4. Fallback si pas de termes : top recettes sans scoring
-    #    (par exemple les 50 premières juste pour ne pas renvoyer vide)
     def fallback_recipes
       Recipe
         .includes(:recipe_ingredients)
-        .limit(100) # assez grand pour pagination
+        .limit(100)
         .map do |r|
-          # même logique DISTINCT pour rester cohérent
           recipe_ing_ids = r.recipe_ingredients.map(&:ingredient_id).uniq
   
           {
@@ -162,13 +149,12 @@ class RecipeSearch
             total_time:   r.total_time,
             yields:     r.yields || nil,
             total_ings:   recipe_ing_ids.size,
-            matched_ings: nil,   # pas de notion de match sans termes
+            matched_ings: nil,
             _score:       0.0
           }
         end
     end
   
-    # 5. Paginate the full array of recipe hashes (already scored/sorted)
     def paginated_result_from_array(full_array)
       total_count = full_array.size
       offset      = (@page - 1) * @per_page

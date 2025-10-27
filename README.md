@@ -11,19 +11,8 @@ The goal was to **design and implement a prototype** that focuses on **product t
 
 My priorities were:
 - Keep the UX frictionless — one simple flow: *add → search → cook*.
-- Design a clean and minimal API structure (`/api/recipes`, `/api/pantry_items`).
-- Deliver something realistic and demo-ready (local or hosted).
-
----
-
-## 🎯 Objective
-
-> Create an application that suggests recipes based on the ingredients the user already has.
-
-Users can:
-1. Manage their **pantry items** (ingredients they have at home)
-2. Get **recipe recommendations** that match their pantry
-3. Open a **recipe detail page** with title, yield, and full ingredients list
+- Design a clean and minimal API structure.
+- Deliver something realistic and demo-ready (local and hosted).
 
 ---
 
@@ -40,54 +29,56 @@ Users can:
 
 ---
 
-## 💡 Product Philosophy
+# 🍽️ Recipe Finder App
 
-Rather than building many features, I focused on **a coherent end-to-end flow**:
+## 🧩 User Stories
 
-1. **User starts empty** → adds ingredients they own  
-2. **Backend filters recipes** based on match ratio  
-3. **UI displays sorted, relevant recipes** with match %, time, and yield  
-4. **Fallbacks everywhere** (images, empty states) to ensure a smooth experience
+### 1. Search for recipes based on available ingredients
+**As a user**, I want to enter the ingredients I currently have at home **so that I can find the most relevant recipes I can cook with them**.
 
-> Every step should “just work” — even if the data is imperfect or incomplete.
+#### ✅ Acceptance Criteria
+- I can input one or multiple ingredients (e.g., “pasta, eggs, tuna”).
+- The application returns a list of recipes.
+- Recipes are **sorted by relevance** — recipes that use the most of my available ingredients appear first.
+- Each recipe in the list shows:
+  - The recipe name
+  - An image (if available)
+  - The number of matching ingredients
+  - The time to prepare the recipe
+- If no recipe matches, a message like “No recipes found with these ingredients” is displayed.
 
----
-
-## 📚 User Stories
-
-### 🧺 1. Manage my pantry
-> As a user, I can add or remove ingredients to keep track of what I have at home.
-
-**Endpoints**
-```
-GET    /api/pantry_items
-POST   /api/pantry_items
-DELETE /api/pantry_items/:id
-```
+#### 💡 Value
+This is the core feature — turning what’s already in the fridge into actual meal ideas.
 
 ---
 
-### 🥣 2. Find recipes I can cook
-> As a user, I can see recipes that best match the ingredients in my pantry.
+### 2. View recipe details
+**As a user**, I want to open a recipe from the results list **to see its full details and know how to prepare it**.
 
-**Logic**
-- Each recipe’s “match ratio” = number of matching ingredients ÷ total ingredients.
-- Sorted by best match first.
+#### ✅ Acceptance Criteria
+- When I click on a recipe, I am redirected to a **recipe detail page**.
+- The detail page displays:
+  - Recipe title  
+  - Estimated preparation time  
+  - Full list of ingredients
+- A “Back” button allows me to return to the previous search results page.
 
-**Endpoint**
-```
-GET /api/recipes
-```
+#### 💡 Value
+Allows the user to take action — from discovery to cooking — without leaving the app.
 
 ---
 
-### 📖 3. View recipe details
-> As a user, I can open a recipe to see details (title, time, yield, ingredients).
+### 3. Preserve entered ingredients when navigating back
+**As a user**, I want my entered ingredients and search results **to remain visible when I navigate back from a recipe detail page**, so I don’t have to re-enter them.
 
-**Endpoint**
-```
-GET /api/recipes/:id
-```
+#### ✅ Acceptance Criteria
+- After performing a search, if I open a recipe and then go back:
+  - My previously entered ingredients remain in the input field.
+  - The search results list remains visible.
+- This behavior persists even if I open several recipes consecutively.
+
+#### 💡 Value
+Improves user experience by reducing friction — allows easy recipe comparison without retyping the ingredient list.
 
 ---
 
@@ -96,153 +87,30 @@ GET /api/recipes/:id
 I used **ChatGPT (GPT-5)** as an assistant to:
 - Speed up boilerplate setup for Rails + Vite integration
 - Debug PostgreSQL setup and migrations
-- Brainstorm a clean API structure
+- Deploy with fly.io
+- Speed up my frontend files in React
 - Format this README
 
 All AI-generated code and text were **reviewed, edited, and validated** by me.  
 Every technical choice (schema, routes, data logic) was implemented manually.
-
-> My approach to AI is pragmatic: it’s a *pair programmer*, not a substitute for understanding.
-
----
-
-## 💾 Dataset
-
-The recipes come from the dataset provided by Pennylane’s prompt:  
-English-language recipes scraped from AllRecipes.com using `recipe-scrapers`.
-
-**Download:**
-```bash
-wget https://pennylane-interviewing-assets-20220328.s3.eu-west-1.amazonaws.com/recipes-en.json.gz   && gzip -dc recipes-en.json.gz > recipes-en.json
-```
-
-Then import via:
-```bash
-bin/rails data:import
-```
 
 ---
 
 ## 🖼️ Image handling
 
 Some recipe images are hosted on Meredith’s CDN (`imagesvc.meredithcorp.io`),  
-which **blocks hotlinking from non-AllRecipes domains** (returns 400).
+which **blocks hotlinking from non-AllRecipes domains**.
 
 To keep a consistent experience, a **local fallback image** is used:
 
 - File: `frontend/public/placeholder-recipe.jpg`
 - React `onError` handler automatically replaces any broken image with this fallback
-- Displayed with soft shadows and subtle opacity, to match the UX palette
 
 > This prevents broken-image icons and ensures a graceful degradation in both dev and production.
-
----
-
-## 🧱 Project structure
-
-```
-pennylane_technical_test/
-│
-├── app/
-│   ├── controllers/
-│   │   ├── api/
-│   │   │   ├── recipes_controller.rb
-│   │   │   └── pantry_items_controller.rb
-│   │   └── static_controller.rb
-│   ├── models/
-│   └── views/ (empty – API only)
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── hooks/
-│   ├── public/
-│   │   └── placeholder-recipe.jpg
-│   ├── vite.config.ts
-│   └── package.json
-│
-├── lib/tasks/frontend.rake   # Rake task to build + copy frontend
-└── db/
-    └── migrations/
-```
-
----
-
-## ⚙️ Setup
-
-### 1️⃣ Dependencies
-- Ruby ≥ 3.2  
-- Node ≥ 18  
-- PostgreSQL ≥ 14
-
-### 2️⃣ Install
-```bash
-bundle install
-cd frontend && npm install
-```
-
-### 3️⃣ DB setup
-```bash
-bin/rails db:create db:migrate
-bin/rails data:import
-```
-
-### 4️⃣ Development
-#### Mode A — Hot reload (best for dev)
-```bash
-# Terminal 1
-bin/rails s
-
-# Terminal 2
-cd frontend
-npm run dev
-```
-→ Frontend: http://localhost:5173  
-→ API: http://localhost:3000/api
-
-#### Mode B — Production preview
-```bash
-bin/rake frontend:build
-bin/rails s
-```
-→ Visit http://localhost:3000
-
----
-
-## 🧭 Rake Tasks
-
-| Command | Description |
-|----------|--------------|
-| `bin/rake frontend:build` | Build & copy the React frontend to `/public` |
-| `bin/rails data:import` | Load and normalize dataset |
-| `bin/rails db:create db:migrate` | Prepare DB schema |
-
----
-
-## 🎨 Design choices
-
-- **Soft purple & indigo tones** (inspired by Pennylane’s visual identity)
-- **Minimal UI** → focus on clarity and hierarchy
-- **Responsive layout** (grid-based, no complex breakpoints)
-- **Typography**: clean sans-serif for readability
-
-> The UX goal was: *pleasant, clear, and non-distracting*.
-
----
-
-## 🚀 Improvements if this were a real product
-
-- [ ] Add persistence of pantry via user login
-- [ ] Improve search UX (autocomplete, fuzzy matching)
-- [ ] Allow “filter by prep time” or “vegetarian”
-- [ ] Cache recipe list per user
-- [ ] Deploy with continuous build (GitHub Actions + Fly.io)
 
 ---
 
 ## ✍️ Author
 
 **Loane Jan**  
-Fullstack Developer — Product-minded engineer who loves combining clean UX with pragmatic backend logic.  
-Built with ❤️ using Rails, React, and a bit of curiosity.
+Fullstack Developer
