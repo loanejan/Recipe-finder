@@ -19,6 +19,20 @@ test:
 
 production:
   <<: *default
-  # Fly va injecter DATABASE_URL quand tu "attach" la base Postgres.
-  # Quand DATABASE_URL est présent, Rails l'utilise directement.
+  url: <%= ENV["DATABASE_URL"] %>
+
+cable:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+
+queue:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+
+cache:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+
+storage:
+  <<: *default
   url: <%= ENV["DATABASE_URL"] %>
