@@ -62,3 +62,8 @@ recipes-en.json.gz
 /frontend/node_modules/
 /frontend/dist/
 
+echo $HOME
+.gitignore
+exit
+exit-cert.pub
+echo $HOME-cert.pub
