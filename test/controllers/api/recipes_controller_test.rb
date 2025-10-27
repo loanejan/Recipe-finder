@@ -29,7 +29,7 @@ class Api::RecipesControllerTest < ActionDispatch::IntegrationTest
     # Peu importe la DB, on renvoie ce qu'on veut.
     RecipeSearch.stub :call, fake_result do
       get "/api/recipes", params: {
-        q: "tomate basilic",
+        ing: "tomate basilic",
         page: "2",
         per_page: "10"
       }

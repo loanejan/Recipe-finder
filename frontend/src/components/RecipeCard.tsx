@@ -1,21 +1,20 @@
 import { Link } from "react-router-dom";
-import React from "react";
 import type { RecipeListItem } from "@/hooks/useRecipesPaginated";
 
 interface RecipeCardProps {
-  r: RecipeListItem;
+  recipe: RecipeListItem;
 }
 
-export default function RecipeCard({ r }: RecipeCardProps) {
+export default function RecipeCard({ recipe }: RecipeCardProps) {
   return (
     <Link
-      to={`/recipes/${r.id}`}
+      to={`/recipes/${recipe.id}`}
       className="block rounded-xl2 overflow-hidden bg-brand-card border border-white/5 shadow-soft hover:shadow-md hover:border-brand-primary/40 transition-shadow transition-colors"
     >
-      {r.image && (
+      {recipe.image && (
         <img
-          src={r.image}
-          alt={r.title}
+          src={recipe.image}
+          alt={recipe.title}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).src = "/placeholder-recipe.jpg";
           }}
@@ -25,26 +24,26 @@ export default function RecipeCard({ r }: RecipeCardProps) {
 
       <div className="p-4 space-y-2">
         <h2 className="text-base font-semibold text-brand-text leading-snug line-clamp-2 group-hover:text-brand-text/90">
-          {r.title}
+          {recipe.title}
         </h2>
 
         <div className="text-sm text-brand-muted flex flex-wrap gap-2">
-          {r.total_time != null && r.total_time > 0 && (
+          {recipe.total_time != null && recipe.total_time > 0 && (
             <span className="flex items-center gap-1">
               <span role="img" aria-label="time">
                 ⏱
               </span>
-              <span>{r.total_time} min</span>
+              <span>{recipe.total_time} min</span>
             </span>
           )}
 
-          {r.total_ings != null && r.matched_ings != null && (
+          {recipe.total_ings != null && recipe.matched_ings != null && (
             <span className="flex items-center gap-1">
               <span role="img" aria-label="match">
                 ✅
               </span>
               <span>
-                {r.matched_ings}/{r.total_ings} ingrédients
+                {recipe.matched_ings}/{recipe.total_ings} ingrédients
               </span>
             </span>
           )}

@@ -22,7 +22,7 @@ export type RecipePageResponse = {
   pagination: PaginationMeta;
 };
 
-// Build query param q=egg,tomato from ["egg","tomato"]
+// Build query param ing=egg,tomato from ["egg","tomato"]
 function buildQueryParamFromIngredients(extraIngredients: string[]) {
   return extraIngredients.join(",");
 }
@@ -52,9 +52,9 @@ export function useRecipesPaginated(extraIngredients: string[]) {
           per_page: "20",
         });
 
-        const q = buildQueryParamFromIngredients(extraIngredients);
-        if (q.trim() !== "") {
-          params.set("q", q);
+        const ing = buildQueryParamFromIngredients(extraIngredients);
+        if (ing.trim() !== "") {
+          params.set("ing", ing);
         }
 
         const res = await fetch(`/api/recipes?${params.toString()}`);
@@ -96,9 +96,9 @@ export function useRecipesPaginated(extraIngredients: string[]) {
         per_page: "20",
       });
 
-      const q = buildQueryParamFromIngredients(extraIngredients);
-      if (q.trim() !== "") {
-        params.set("q", q);
+      const ing = buildQueryParamFromIngredients(extraIngredients);
+      if (ing.trim() !== "") {
+        params.set("ing", ing);
       }
 
       const res = await fetch(`/api/recipes?${params.toString()}`);

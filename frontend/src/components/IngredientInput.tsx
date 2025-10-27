@@ -15,7 +15,7 @@ export default function IngredientInput({
 }: IngredientInputProps) {
   const [draft, setDraft] = useState("");
 
-  function addChipFromDraft() {
+  function addTagFromDraft() {
     const cleaned = draft.trim().toLowerCase();
     if (cleaned !== "" && !ingredients.includes(cleaned)) {
       onChange([...ingredients, cleaned]);
@@ -26,11 +26,11 @@ export default function IngredientInput({
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" || e.key === "," ) {
       e.preventDefault();
-      addChipFromDraft();
+      addTagFromDraft();
     }
   }
 
-  function removeChip(name: string) {
+  function removeTag(name: string) {
     onChange(ingredients.filter((ing) => ing !== name));
   }
 
@@ -39,7 +39,6 @@ export default function IngredientInput({
       <div className="text-sm font-medium text-brand-text">{label}</div>
 
       <div className="rounded-xl2 bg-brand-card border border-white/10 px-3 py-2 shadow-soft">
-        {/* chips row */}
         <div className="flex flex-wrap gap-2 mb-2">
           {ingredients.map((ing) => (
             <span
@@ -49,7 +48,7 @@ export default function IngredientInput({
               <span>{ing}</span>
               <button
                 type="button"
-                onClick={() => removeChip(ing)}
+                onClick={() => removeTag(ing)}
                 className="text-brand-primary/70 hover:text-brand-primary/100 text-[10px] leading-none"
                 aria-label={`Remove ${ing}`}
               >
@@ -63,7 +62,7 @@ export default function IngredientInput({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={addChipFromDraft}
+          onBlur={addTagFromDraft}
           placeholder={placeholder}
           className="w-full bg-transparent text-sm text-brand-text placeholder-brand-muted focus:outline-none"
         />

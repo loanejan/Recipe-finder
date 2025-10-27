@@ -4,8 +4,8 @@ import IngredientInput from "@/components/IngredientInput";
 import RecipeCard from "@/components/RecipeCard";
 import { RecipeListItem, useRecipesPaginated } from "@/hooks/useRecipesPaginated";
 
-function parseIngsParam(sp: URLSearchParams): string[] {
-  const raw = sp.get("q");
+function parseIngsParam(params: URLSearchParams): string[] {
+  const raw = params.get("ing");
   if (!raw) return [];
   return raw
     .split(",")
@@ -13,25 +13,22 @@ function parseIngsParam(sp: URLSearchParams): string[] {
     .filter((s) => s.length > 0);
 }
 
-function serializeIngsParam(q: string[]): string {
-  return q.join(",");
+function serializeIngsParam(ing: string[]): string {
+  return ing.join(",");
 }
 
 export default function RecipesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // chips -> dérivées de l'URL (?a=egg,tomato)
   const extraIngredients = useMemo(() => parseIngsParam(searchParams), [searchParams]);
 
-  // quand on modifie les chips, on met à jour l'URL
-  // (ça re-triggera le hook useRecipesPaginated car extraIngredients change)
   const handleChangeIngredients = useCallback(
     (nextIngredients: string[]) => {
       const next = new URLSearchParams(searchParams);
       if (nextIngredients.length === 0) {
-        next.delete("q");
+        next.delete("ing");
       } else {
-        next.set("q", serializeIngsParam(nextIngredients));
+        next.set("ing", serializeIngsParam(nextIngredients));
       }
       setSearchParams(next, { replace: true });
     },
@@ -68,8 +65,8 @@ export default function RecipesPage() {
       ) : (
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {recipes.map((r: RecipeListItem) => (
-              <RecipeCard key={r.id} r={r} />
+            {recipes.map((recipe: RecipeListItem) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </section>
 
