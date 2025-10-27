@@ -3,7 +3,7 @@ import { useRecipeDetail } from "@/hooks/useRecipeDetail";
 
 export default function RecipePage() {
   const navigate = useNavigate();
-  // On récupère l'ID de la recette depuis l'URL /recipes/:id
+
   const { id } = useParams<{ id: string }>();
 
   const { data: recipe, loading, error } = useRecipeDetail(id);
@@ -25,7 +25,6 @@ export default function RecipePage() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto space-y-8">
-      {/* Header nav */}
       <div className="flex items-start justify-between">
         <button
           onClick={() => navigate(-1)}
@@ -46,9 +45,8 @@ export default function RecipePage() {
         )}
       </div>
 
-      {/* Card visuelle */}
+
       <section className="rounded-xl2 overflow-hidden bg-brand-card border border-white/5 shadow-soft">
-        {/* Image si dispo */}
         {recipe.image && (
           <img
             src={recipe.image}
@@ -61,12 +59,10 @@ export default function RecipePage() {
         )}
 
         <div className="p-5 space-y-4">
-          {/* Titre */}
           <h1 className="text-xl font-semibold text-brand-text leading-tight">{recipe.title}</h1>
 
-          {/* Meta résumé */}
           <div className="text-sm text-brand-muted flex flex-wrap gap-x-4 gap-y-2">
-            {recipe.total_time && recipe.total_time > 0 && (
+            {recipe.total_time != null && recipe.total_time > 0 && (
               <span className="flex items-center gap-1">
                 <span role="img" aria-label="time">
                   ⏱
@@ -85,7 +81,6 @@ export default function RecipePage() {
             )}
           </div>
 
-          {/* Ingrédients */}
           {recipe.ingredients && recipe.ingredients.length > 0 && (
             <div className="space-y-2">
               <h2 className="text-sm font-medium text-brand-text">Ingredients</h2>

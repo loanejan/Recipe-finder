@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import IngredientChipsInput from "@/components/IngredientChipsInput";
+import IngredientInput from "@/components/IngredientInput";
 import RecipeCard from "@/components/RecipeCard";
 import { RecipeListItem, useRecipesPaginated } from "@/hooks/useRecipesPaginated";
 
@@ -51,7 +51,7 @@ export default function RecipesPage() {
           </p>
         </div>
 
-        <IngredientChipsInput
+        <IngredientInput
           ingredients={extraIngredients}
           onChange={handleChangeIngredients}
           label="Add ingredients you want to use"

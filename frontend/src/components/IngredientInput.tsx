@@ -1,18 +1,18 @@
 import { useState, KeyboardEvent } from "react";
 
-type IngredientChipsInputProps = {
+type IngredientInputProps = {
   ingredients: string[];
   onChange: (next: string[]) => void;
   placeholder?: string;
   label?: string;
 };
 
-export default function IngredientChipsInput({
+export default function IngredientInput({
   ingredients,
   onChange,
   placeholder = "e.g. egg, tomato, garlic",
   label = "Extra ingredients"
-}: IngredientChipsInputProps) {
+}: IngredientInputProps) {
   const [draft, setDraft] = useState("");
 
   function addChipFromDraft() {
@@ -59,12 +59,11 @@ export default function IngredientChipsInput({
           ))}
         </div>
 
-        {/* input row */}
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={addChipFromDraft} // user clicks away -> commit current draft
+          onBlur={addChipFromDraft}
           placeholder={placeholder}
           className="w-full bg-transparent text-sm text-brand-text placeholder-brand-muted focus:outline-none"
         />
