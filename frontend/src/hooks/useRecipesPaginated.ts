@@ -22,23 +22,18 @@ export type RecipePageResponse = {
   pagination: PaginationMeta;
 };
 
-// Build query param ing=egg,tomato from ["egg","tomato"]
 function buildQueryParamFromIngredients(extraIngredients: string[]) {
   return extraIngredients.join(",");
 }
 
 export function useRecipesPaginated(extraIngredients: string[]) {
-  // all recipes loaded so far (we keep appending pages)
   const [recipes, setRecipes] = useState<RecipeListItem[]>([]);
-  // pagination / loading state
   const [page, setPage] = useState<number>(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // whenever extraIngredients changes (chips change),
-  // we reset everything and refetch page 1 fresh
   useEffect(() => {
     let cancelled = false;
 
@@ -81,7 +76,6 @@ export function useRecipesPaginated(extraIngredients: string[]) {
     };
   }, [extraIngredients]);
 
-  // load the next page and append
   const loadMore = useCallback(async () => {
     if (!hasNextPage || loadingMore) return;
 
@@ -107,7 +101,6 @@ export function useRecipesPaginated(extraIngredients: string[]) {
       }
       const data: RecipePageResponse = await res.json();
 
-      // append new recipes
       setRecipes((prev) => [...prev, ...data.recipes]);
       setPage(data.pagination.page);
       setHasNextPage(data.pagination.has_next_page);
