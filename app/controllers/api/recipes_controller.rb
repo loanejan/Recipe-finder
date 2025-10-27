@@ -8,11 +8,17 @@ module Api
       )
 
       render json: result
+      
+      rescue StandardError => e
+        render json: { error: "Search failed", details: e.message }, status: :unprocessable_entity
     end
 
     def show
       recipe = RecipeDetail.call(id: params[:id])
       render json: recipe
+
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Recipe not found" }, status: :not_found
     end
   end
 end
