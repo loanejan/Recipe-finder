@@ -24,11 +24,11 @@ class RecipeDetail
   private
 
   def serialize_ingredients(recipe)
-    recipe.recipe_ingredients.map do |ri|
+    recipe.recipe_ingredients.map do |ing|
       {
-        id:   ri.ingredient_id,
-        name: ri.ingredient.name,
-        raw:  ri.raw_text
+        id:   ing.ingredient_id,
+        name: ing.ingredient.name,
+        raw:  ing.raw_text
       }
     end
   end

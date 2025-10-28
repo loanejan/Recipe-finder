@@ -1,5 +1,5 @@
-# - counts DISTINCT ingredients per recipe
-# - counts DISTINCT matched ingredients
+# - counts ingredients per recipe
+# - counts matched ingredients
 # - returns total_ings and matched_ings
 #
 class RecipeSearch
@@ -33,6 +33,8 @@ class RecipeSearch
   
     private
   
+    # Builds a unique, normalized list of search terms from the user query
+    # ex: "Tomato, cheese  cheese" → ["tomato", "cheese"]
     def build_terms
       quick_terms = @query
         .to_s
@@ -42,97 +44,21 @@ class RecipeSearch
   
       (quick_terms).uniq
     end
+
+    def paginated_result_from_array(full_array)
+      total_count = full_array.size
+      offset      = (@page - 1) * @per_page
+      slice       = full_array.slice(offset, @per_page) || []
   
-    # - all_ids: tous les ingredient_ids qui matchent un des termes
-    
-    def match_ingredients_by_term(terms)
-      id_to_term = {}
-    
-      terms.each do |term|
-        matches = Ingredient
-          .where("name ILIKE ?", "%#{term}%") # Use ILIKE for case-insensitive search (PostgreSQL-specific)
-          .pluck(:id)
-      
-        matches.each do |ing_id|
-          id_to_term[ing_id] = term
-        end
-      end
-    
-      all_ids = id_to_term.keys
-      [all_ids, id_to_term] # - id_to_term: hash { ingredient_id => utilisateur_term }
-    end
-    
-      
-    def score_candidates(user_ing_ids, id_to_term)
-      return [] if user_ing_ids.blank?
-    
-      matcher = RecipeMatcher.new(user_ing_ids)
-    
-      # 1. recettes candidates = celles qui utilisent AU MOINS un ingredient_id mentionné
-      candidates = Recipe
-        .joins(:recipe_ingredients)
-        .where(recipe_ingredients: { ingredient_id: user_ing_ids })
-        .distinct
-    
-      return [] if candidates.empty?
-    
-      recipe_ids = candidates.pluck(:id)
-    
-      # 2. on récupère tous les ingrédients (ids) pour ces recettes en une seule fois
-      rows = RecipeIngredient
-        .where(recipe_id: recipe_ids)
-        .pluck(:recipe_id, :ingredient_id)
-    
-      # 3. on construit, en mémoire:
-      #    ingredients_by_recipe[recipe_id] = [ingredient_id1, ingredient_id2, ...]
-      ingredients_by_recipe = {}
-      rows.each do |recipe_id, ingredient_id|
-        (ingredients_by_recipe[recipe_id] ||= []) << ingredient_id
-      end
-    
-      ingredients_by_recipe.each do |rid, ing_list|
-        ingredients_by_recipe[rid] = ing_list.uniq
-      end
-    
-      # 4. on construit la réponse finale pour chaque recette
-      scored = candidates.map do |recipe|
-        recipe_ing_ids = ingredients_by_recipe[recipe.id] || []
-      
-        total_ings = recipe_ing_ids.size
-      
-        # ---- NOUVEAU CALCUL matched_ings ----
-        #
-        # On veut compter combien de "termes utilisateur" couvrent les ingrédients de la recette,
-        # sans jamais compter deux fois le même terme.
-        #
-        # Exemple :
-        #   recette a [12, 57] (sel fin, sel gros)
-        #   id_to_term[12] = "sel"
-        #   id_to_term[57] = "sel"
-        #   => matched_terms = ["sel"] => size = 1
-        #
-        matched_terms = recipe_ing_ids.map { |iid| id_to_term[iid] }.compact.uniq
-        matched_ings  = matched_terms.size
-      
-        # score métier basé sur matched_ings/total_ings
-        score = matcher.score_for(
-          total_ings:   total_ings,
-          matched_ings: matched_ings
-        )
-      
-        {
-          id:           recipe.id,
-          title:        recipe.title,
-          image:        recipe.image,
-          total_time:   recipe.total_time,
-          yields:       recipe.yields || nil,
-          total_ings:   total_ings,
-          matched_ings: matched_ings,
-          _score:       score
+      {
+        recipes: slice.map { |h| h.except(:_score) },
+        pagination: {
+          page:          @page,
+          per_page:      @per_page,
+          total_count:   total_count,
+          has_next_page: (offset + @per_page) < total_count
         }
-      end
-    
-      scored.sort_by { |h| -h[:_score] }
+      }
     end
 
     def fallback_recipes
@@ -154,20 +80,97 @@ class RecipeSearch
           }
         end
     end
-  
-    def paginated_result_from_array(full_array)
-      total_count = full_array.size
-      offset      = (@page - 1) * @per_page
-      slice       = full_array.slice(offset, @per_page) || []
-  
+
+    # Finds ingredient ids matching each term and returns both the ids and a mapping
+    # ex: ["salt", "tomato"] → [1, 2, 5], {1=>"salt", 2=>"tomato", 5=>"tomato"}
+    def match_ingredients_by_term(terms) 
+      id_to_term = {}
+    
+      terms.each do |term|
+        matches = Ingredient
+          .where("name ILIKE ?", "%#{term}%") # Use ILIKE for case-insensitive search (PostgreSQL-specific)
+          .pluck(:id)
+      
+        matches.each do |ing_id|
+          id_to_term[ing_id] = term
+        end
+      end
+    
+      all_ids = id_to_term.keys
+      [all_ids, id_to_term] # - id_to_term: hash { ingredient_id => utilisateur_term }
+    end
+
+    # Scores all candidate recipes based on how many distinct user terms match their ingredients 
+    # ex: "salt" matches 2 ingredients → higher score
+    def score_candidates(user_ing_ids, id_to_term)
+      return [] if user_ing_ids.blank?
+
+      matcher    = RecipeMatcher.new(user_ing_ids)
+      candidates = candidate_recipes(user_ing_ids)
+      return [] if candidates.empty?
+
+      ingredients_by_recipe = build_ingredients_map(candidates)
+
+      scored = candidates.map do |recipe|
+        scored_recipe(recipe, ingredients_by_recipe, id_to_term, matcher)
+      end
+    
+      scored.sort_by { |h| -h[:_score] }
+    end
+
+    # Returns all recipes that include at least one of the user's ingredient ids
+    def candidate_recipes(user_ing_ids)
+      Recipe
+        .joins(:recipe_ingredients)
+        .where(recipe_ingredients: { ingredient_id: user_ing_ids })
+        .distinct
+    end
+
+    # Builds a hash mapping each recipe ID to its unique list of ingredient IDs
+    # ex: {1=>[2,3], 2=>[4,5,6]}
+    # A VERIFIER
+    def build_ingredients_map(candidates)
+      recipe_ids = candidates.pluck(:id)
+
+      rows = RecipeIngredient
+        .where(recipe_id: recipe_ids)
+        .pluck(:recipe_id, :ingredient_id)
+
+      ingredients_by_recipe = { }
+
+      rows.each do |recipe_id, ingredient_id|
+        (ingredients_by_recipe[recipe_id] ||= []) << ingredient_id
+      end
+    
+      ingredients_by_recipe.transform_values!(&:uniq)
+    
+      ingredients_by_recipe
+    end
+
+    # Builds a scored hash for a single recipe based on how many distinct user terms match its ingredients
+    def scored_recipe(recipe, ingredients_by_recipe, id_to_term, matcher)
+      recipe_ing_ids = ingredients_by_recipe[recipe.id] || []
+
+      total_ings = recipe_ing_ids.size
+
+      # Count distinct user terms matching the recipe's ingredients
+      matched_terms = recipe_ing_ids.map { |id| id_to_term[id] }.compact.uniq
+      matched_ings  = matched_terms.size
+
+      score = matcher.score_for(
+        total_ings:   total_ings,
+        matched_ings: matched_ings
+      )
+
       {
-        recipes: slice.map { |h| h.except(:_score) },
-        pagination: {
-          page:          @page,
-          per_page:      @per_page,
-          total_count:   total_count,
-          has_next_page: (offset + @per_page) < total_count
-        }
+        id:           recipe.id,
+        title:        recipe.title,
+        image:        recipe.image,
+        total_time:   recipe.total_time,
+        yields:       recipe.yields || nil,
+        total_ings:   total_ings,
+        matched_ings: matched_ings,
+        _score:       score
       }
     end
 end  

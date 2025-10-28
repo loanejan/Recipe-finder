@@ -1,6 +1,6 @@
 
 # RecipeMatcher encapsulates how we score a recipe match.
-# We don't touch ActiveRecord here; we just apply product logic.
+# We apply product logic.
 class RecipeMatcher
   attr_reader :user_ingredient_ids
 
@@ -10,8 +10,8 @@ class RecipeMatcher
 
   # Returns a numeric score. Higher = more relevant.
   # We expect:
-  #   total_ings   : number of DISTINCT ingredients in the recipe
-  #   matched_ings : number of DISTINCT ingredients the user already has
+  #   total_ings   : number of ingredients in the recipe
+  #   matched_ings : number of ingredients the user already has
   def score_for(total_ings:, matched_ings:)
     return 0.0 if total_ings.to_i <= 0
 
