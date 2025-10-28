@@ -27,7 +27,7 @@ class RecipeSearch
       all_ids, id_to_term = match_ingredients_by_term(terms)
       return paginated_result_from_array([]) if all_ids.empty?
   
-      scored = score_candidates_in_ruby(all_ids, id_to_term)
+      scored = score_candidates(all_ids, id_to_term)
       paginated_result_from_array(scored)
     end
   
@@ -50,7 +50,7 @@ class RecipeSearch
     
       terms.each do |term|
         matches = Ingredient
-          .where("lower(name) LIKE ?", "%#{term.downcase}%")
+          .where("name ILIKE ?", "%#{term}%") # Use ILIKE for case-insensitive search (PostgreSQL-specific)
           .pluck(:id)
       
         matches.each do |ing_id|
@@ -63,7 +63,7 @@ class RecipeSearch
     end
     
       
-    def score_candidates_in_ruby(user_ing_ids, id_to_term)
+    def score_candidates(user_ing_ids, id_to_term)
       return [] if user_ing_ids.blank?
     
       matcher = RecipeMatcher.new(user_ing_ids)
