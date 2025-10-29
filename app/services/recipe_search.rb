@@ -3,16 +3,16 @@
 # - returns total_ings and matched_ings
 #
 class RecipeSearch
-    def self.call(query:, page:, per_page:)
+    def self.call(ingredient:, page:, per_page:)
       new(
-        query:        query,
+        ingredient:        ingredient,
         page:         page,
         per_page:     per_page
       ).call
     end
   
-    def initialize(query:, page:, per_page:)
-      @query        = query
+    def initialize(ingredient:, page:, per_page:)
+      @ingredient        = ingredient
       @page         = (page.presence || 1).to_i
       @per_page     = (per_page.presence || 20).to_i
     end
@@ -33,10 +33,10 @@ class RecipeSearch
   
     private
   
-    # Builds a unique, normalized list of search terms from the user query
+    # Builds a unique, normalized list of search terms from the user ingredient
     # ex: "Tomato, cheese  cheese" → ["tomato", "cheese"]
     def build_terms
-      quick_terms = @query
+      quick_terms = @ingredient
         .to_s
         .downcase
         .split(/[,\s]+/)
