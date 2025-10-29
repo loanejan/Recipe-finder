@@ -1,4 +1,4 @@
-# 🍳 Pennylane Technical Test — Recipe Finder
+# 🍳 Recipe Finder
 
 > A small full-stack web application that helps users find relevant recipes based on the ingredients they already have at home.
 
