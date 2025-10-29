@@ -6,7 +6,6 @@
 
 ## 👋 Context & Approach
 
-This project was completed as part of the **Software Engineer Technical Test @ Pennylane**.  
 The goal was to **design and implement a prototype** that focuses on **product thinking, simplicity, and user experience**, rather than pure styling or feature volume.
 
 My priorities were:
