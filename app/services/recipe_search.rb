@@ -1,7 +1,3 @@
-# - counts ingredients per recipe
-# - counts matched ingredients
-# - returns total_ings and matched_ings
-#
 class RecipeSearch
     def self.call(ingredients:, page:, per_page:)
       new(
@@ -25,10 +21,10 @@ class RecipeSearch
       end
   
       recipe_ing_ids, ids_to_user_ings = match_recipe_ingredients_by_user_ingredient(user_ingredients_array)
-      return paginated_result_from_array([]) if recipe_ing_ids.empty?
+      return paginated_result_from_recipes([]) if recipe_ing_ids.empty?
   
       scored_recipes = score_recipes(recipe_ing_ids, ids_to_user_ings)
-      paginated_result_from_array(scored_recipes)
+      paginated_result_from_recipes(scored_recipes)
     end
   
     private
@@ -45,10 +41,10 @@ class RecipeSearch
       (normalized_ings).uniq
     end
 
-    def paginated_result_from_array(full_array)
-      total_count = full_array.size
+    def paginated_result_from_recipes(scored_recipes)
+      total_count = scored_recipes.size
       offset      = (@page - 1) * @per_page
-      slice       = full_array.slice(offset, @per_page) || []
+      slice       = scored_recipes.slice(offset, @per_page) || []
   
       {
         recipes: slice.map { |h| h.except(:_score) },
