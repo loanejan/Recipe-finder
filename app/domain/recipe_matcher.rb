@@ -1,6 +1,5 @@
 
-# RecipeMatcher encapsulates how we score a recipe match.
-# We apply product logic.
+# Here we apply product logic: it encapsulates how we score a recipe match
 class RecipeMatcher
   attr_reader :user_ingredient_ids
 
@@ -8,10 +7,6 @@ class RecipeMatcher
     @user_ingredient_ids = Array(user_ingredient_ids).presence || []
   end
 
-  # Returns a numeric score. Higher = more relevant.
-  # We expect:
-  #   total_ings   : number of ingredients in the recipe
-  #   matched_ings : number of ingredients the user already has
   def score_for(total_ings:, matched_ings:)
     return 0.0 if total_ings.to_i <= 0
 
