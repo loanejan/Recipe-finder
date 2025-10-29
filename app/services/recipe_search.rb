@@ -17,7 +17,7 @@ class RecipeSearch
       user_ingredients_array = build_normalized_user_ingredients
   
       if user_ingredients_array.empty?
-        return paginated_result_from_array(fallback_recipes)
+        return paginated_result_from_recipes(fallback_recipes)
       end
   
       recipe_ing_ids, ids_to_user_ings = match_recipe_ingredients_by_user_ingredient(user_ingredients_array)
@@ -100,11 +100,11 @@ class RecipeSearch
     def score_recipes(recipe_ing_ids, ids_to_user_ings)
       return [] if recipe_ing_ids.blank?
 
-      matcher = RecipeMatcher.new(recipe_ing_ids)
       recipes = candidate_recipes(recipe_ing_ids)
       return [] if recipes.empty?
 
       ingredients_by_recipe = build_ingredients_map(recipes)
+      matcher = RecipeMatcher.new
 
       scored_recipes = recipes.map do |recipe|
         scored_recipe(recipe, ingredients_by_recipe, ids_to_user_ings, matcher)
